@@ -1,0 +1,96 @@
+body{
+    padding: 0px;
+    margin: 0px;
+}
+
+header{
+    position: sticky;
+    top: 0px;
+    z-index:100;
+}
+#header-container{
+    background-color:#000066;
+    height:auto;
+}
+
+#headericon-container{
+    display: inline-block;
+    width: 10%;
+    height: 10%;
+    vertical-align: top;
+}
+
+#heading-container{
+    background-color:#000066;
+    display: inline-block;
+    width: 90%;
+    height: 10%;
+    vertical-align: top;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 0px;
+    margin: 0px;
+    
+}
+
+#headericon{
+    width: 70px;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 0px;
+    margin: 0px;
+}
+
+#heading{
+    color: white;
+}
+
+#main-container{
+    display:block;
+}
+#editor { 
+    width: 500px;
+    height: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+}
+#runbtn-container{
+    padding: 10px;
+    vertical-align: middle;
+}
+#run-button{
+    background-color: green;
+    border-radius: 10px;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    font-weight: bold;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    padding:7px;
+    
+}
+
+#run-button:hover{
+    padding: 9px;
+}
+
+#terminal-container{
+    overflow-x: scroll;
+    width: auto;
+    
+}
+#terminal{
+    width: 700px;
+    height: 500px;
+    display: block;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
