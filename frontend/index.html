@@ -59,12 +59,12 @@
             t.removeFromBuffer();
         }
         else if(keyname=='Enter'){           
-            ws.send(t.getBufferValue());
+            ws.send(t.getBuffer());
             t.nextLine();
-            t.clearBuffer();
+            t.setBuffer();
         }
         else{
-        t.writeOnBuffer(keyname);
+        t.writeTextOnBuffer(keyname);
         }
     }
 

@@ -1,125 +1,131 @@
 
-
-
 class Terminal{
-
+    #ctx
+    #c
+    #posx
+    #posy
+    #padx
+    #pady
+    #buffer
+    #tempBuffer
+    #fontsize
+    #cursor
     constructor(termid,fontsize){
-        super();
-        var c = document.getElementById(termid);
-        this.ctx=c.getContext('2d');
-
-        let r=c.getBoundingClientRect();
-        c.width=r.width;
-        c.height=r.height;
-
-        this.ctx.fillStyle="black";
-        this.ctx.textBaseline = "top";
-        this.ctx.fillRect(0, 0, c.width, c.height);
-        this.posx=0;
-        this.posy=0;
-        this.padx=0;
-        this.pady=3;
-        this.width=c.width;
-        this.height=c.height;
-        this.iscursor=true;
-        setInterval(()=>{this.cursorHandler()},700);
-        this.curbufline=this.posy;
-        this.buffer="";
-        this.fontsize=fontsize;
+        this.#c = document.getElementById(termid);
+        this.#ctx=this.#c.getContext('2d');
+        //Screen Setup
+        let r=this.#c.getBoundingClientRect();
+        this.#c.width=r.width;
+        this.#c.height=r.height;
+        this.#fontsize=fontsize;
+        this.#ctx.textBaseline = "top";
+        this.clearScreen();
+        this.#posx=0;
+        this.#posy=0;
+        this.#padx=0;
+        this.#pady=3;
+        this.#buffer="";
+        this.#tempBuffer="";
+        this.#cursor=true;
+        setInterval(()=>{this.#handleCursor()},700);
     }
 
-
-    setWriteMode(color='white'){
-        this.ctx.font = this.fontsize.toString()+"px Aerial";
-        this.ctx.fillStyle =color;
+    clearScreen(){
+        this.#posx=0;
+        this.#posy=0;
+        this.#ctx.fillStyle="black";
+        this.#ctx.fillRect(0, 0, this.#c.width, this.#c.height);
     }
 
-    writeText(text){
-    //renders text on screen
-    this.removeCursor();
-    this.setWriteMode();
-    this.ctx.fillStyle='white';
-
-    for(let i=0;i<text.length;i++){
-        this.drawChar(text[i]);
+    #setWriteMode(){
+        this.#ctx.font = this.#fontsize.toString()+"px Aerial";
+        this.#ctx.fillStyle ='white';
     }
 
-    }
-
-    drawChar(char){
-        let charwidth=Math.ceil(this.ctx.measureText(char).width);
-        let isOverflow=(this.posx+charwidth)>(this.width);
+    #drawChar(char){
+        //This function is responsible for writing characters in appropriate position
+        this.#drawCursor('black');
+        this.#setWriteMode();
+        let charwidth=Math.ceil(this.#ctx.measureText(char).width);
+        let isOverflow=(this.#posx+charwidth)>(this.#c.width-1);
 
         if(isOverflow){
-            this.posy+=this.fontsize+this.pady;
-            this.posx=0;
+            this.#posy+=this.#fontsize+this.#pady;
+            this.#posx=0;
         }
 
         if(char=='\n'){
-            this.posy+=this.fontsize+this.pady;
-            this.posx=0; 
+            this.nextLine();
         }
         else{
-        this.ctx.fillText(char,this.posx,this.posy);
-        this.posx=this.posx+charwidth+2;
+            this.#ctx.fillText(char,this.#posx,this.#posy);
+            this.#posx=this.#posx+charwidth+2;
         }
     }
 
-    clearText(){
-        //clears text from screen
-        let h=this.posy-this.curbufline+this.fontsize;
-        this.setWriteMode('black');
-        this.ctx.fillRect(0,this.curbufline,this.width,h);
-        this.posx=0;
-        this.posy=this.curbufline;
-    }
+    writeTextOnBuffer(str){
+        this.#tempBuffer+=str;
 
-    writeOnBuffer(string){
-        this.buffer+=string;
-        
-        this.writeText(string);
-    }
-
-    cursorHandler(){
-        if(this.iscursor){
-            this.setWriteMode('white');
-            this.ctx.fillRect(this.posx,this.posy,7,this.fontsize);
-            this.iscursor=false;
-        }else{
-            this.setWriteMode('black');
-            this.ctx.fillRect(this.posx,this.posy,7,this.fontsize);
-            this.iscursor=true;
+        for(let i=0;i<str.length;i++){
+            this.#drawChar(str[i]);
         }
     }
 
-    removeCursor(){
-        this.setWriteMode('black');
-        this.ctx.fillRect(this.posx,this.posy,7,this.fontsize);
-        this.iscursor=false;
+    setBuffer(){
+        this.#buffer+=this.#tempBuffer;
+    }
+
+    writeText(str){
+        this.#buffer+=this.#tempBuffer;
+        this.#tempBuffer="";
+
+        for(let i=0;i<str.length;i++){
+            this.#drawChar(str[i]);
+        }
     }
 
     removeFromBuffer(){
-        this.buffer=this.buffer.substring(0,this.buffer.length-1);
-        this.clearText();
-        this.writeText(this.buffer);
+        if(this.#tempBuffer.length==0)
+            return;
+        this.#tempBuffer=this.#tempBuffer.substring(0,this.#tempBuffer.length-1);
+        this.clearScreen();
+
+        for(let i=0;i<this.#buffer.length;i++){
+            this.#drawChar(this.#buffer[i]);
+        }
+
+        for(let i=0;i<this.#tempBuffer.length;i++){
+            this.#drawChar(this.#tempBuffer[i]);
+        }
+
+    }
+    #drawCursor(color){
+        this.#ctx.fillStyle =color;
+        this.#ctx.fillRect(this.#posx, this.#posy,10, this.#fontsize);
+    }
+    #handleCursor(){
+        if(this.#cursor){
+            this.#drawCursor('white');
+            this.#cursor=false;
+        }else{
+            this.#drawCursor('black');
+            this.#cursor=true;
+        }
     }
 
-    nextLine(callback){
-        //callback function is handler for after clicking next line
-        this.removeCursor();
-        this.posx=0;
-        this.posy+=this.fontsize+this.pady;
-        this.curbufline=this.posy;
-        this.buffer="";
-        if(callback!=null)
-            callback(this.buffer);
+    getBuffer(){
+        return this.#tempBuffer;
     }
 
-    getBufferValue(){
-        return this.buffer;
+    setBuffer(){
+        this.#buffer+=this.#tempBuffer;
+        this.#tempBuffer="";
     }
-    clearBuffer(){
-        this.curbufline=this.posy;
-        this.buffer="";
+
+    nextLine(){
+        this.#drawCursor('black');
+        this.#posy+=this.#fontsize+this.#pady;
+        this.#posx=0; 
     }
+
 }
