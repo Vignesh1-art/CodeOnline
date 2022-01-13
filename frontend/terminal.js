@@ -10,6 +10,7 @@ class Terminal{
     #tempBuffer
     #fontsize
     #cursor
+    #writeLock
     constructor(termid,fontsize){
         this.#c = document.getElementById(termid);
         this.#ctx=this.#c.getContext('2d');
@@ -27,6 +28,7 @@ class Terminal{
         this.#buffer="";
         this.#tempBuffer="";
         this.#cursor=true;
+        this.#writeLock=false;
         setInterval(()=>{this.#handleCursor()},700);
     }
 
@@ -44,6 +46,9 @@ class Terminal{
 
     #drawChar(char){
         //This function is responsible for writing characters in appropriate position
+        if(this.#writeLock)
+        return;
+
         this.#drawCursor('black');
         this.#setWriteMode();
         let charwidth=Math.ceil(this.#ctx.measureText(char).width);
@@ -108,7 +113,7 @@ class Terminal{
     }
 
     #handleCursor(){
-        if(this.#cursor){
+        if(this.#cursor && this.#writeLock==false){
             this.#drawCursor('white');
             this.#cursor=false;
         }else{
@@ -127,12 +132,19 @@ class Terminal{
     }
 
     nextLine(){
+        if(this.#writeLock)
+        return;
+
         this.#drawCursor('black');
         this.#posy+=this.#fontsize+this.#pady;
         this.#posx=0;
         this.#buffer+=this.#tempBuffer;
         this.#tempBuffer="";
         this.#buffer+='\n';
+    }
+
+    setWriteLock(val){
+        this.#writeLock=val;
     }
 
 }

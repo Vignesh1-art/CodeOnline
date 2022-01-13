@@ -8,17 +8,19 @@ from subprocess_communication import SubprocessCommunication
 import subprocess
 import time
 import threading
+import asyncio
 
 
-
-def setupCompilerService(com):
+def setupCompilerService(com,obj):
+    asyncio.set_event_loop(asyncio.new_event_loop())
     args=['py','C:\\dev\\web\\CodeOnline\\userpgm.py']
     p=subprocess.Popen(args,stdin=com.getInputStream(),stdout=com.getOutputStream(),stderr=com.getOutputStream())
     p.wait()
     print("program ended")
     time.sleep(0.5)
     com.endCommunication()
-
+    obj.close()
+    print("Closing connection")
 
 define('port', default=8888, help='port to listen on')
 
@@ -33,22 +35,21 @@ class CompilerService(ws.WebSocketHandler):
         self.__issetup=False
         self.__supp_langs=('py--','java')
         self.__com=SubprocessCommunication()
-
-        pass
+        print("New client connnected")
         
     def on_message(self, message):
         if self.__issetup==False:
             lang=message[0:4]
             if lang in self.__supp_langs:
-                #pgmfile=open('C:\\dev\\web\\CodeOnline\\userpgm.py','w+')
-                #pgmfile.write(message[4:])
-                #pgmfile.close()
+                pgmfile=open('C:\\dev\\web\\CodeOnline\\userpgm.py','w+')
+                pgmfile.write(message[4:])
+                pgmfile.close()
 
                 def callback(msg):
                     self.write_message(msg)
 
                 self.__com.addOuputStreamListner(callback)
-                threading.Thread(target=setupCompilerService,args=[self.__com]).start()
+                threading.Thread(target=setupCompilerService,args=[self.__com,self]).start()
             self.__issetup=True
         else:
             self.__com.writeStream(message+'\r\n')

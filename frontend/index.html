@@ -40,9 +40,17 @@
         <script>
             var ws;
             function clicked(){
+                t.setWriteLock(false);
                 ws=new WebSocket("ws://localhost:8888");
                 ws.addEventListener('open', function (event) {
                         ws.send("py--"+editor.getValue());
+                        t.clearScreen();
+                });
+
+                ws.addEventListener('close', function (event) {
+                        t.nextLine();
+                        t.writeText("Your program is exited");
+                        t.setWriteLock(true);
                 });
 
                 ws.addEventListener('message',function (event) {
