@@ -78,7 +78,8 @@ class Terminal{
     writeText(str){
         this.#buffer+=this.#tempBuffer;
         this.#tempBuffer="";
-
+        this.#buffer+=str;
+        
         for(let i=0;i<str.length;i++){
             this.#drawChar(str[i]);
         }
