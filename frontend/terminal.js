@@ -55,7 +55,8 @@ class Terminal{
         }
 
         if(char=='\n'){
-            this.nextLine();
+            this.#posy+=this.#fontsize+this.#pady;
+            this.#posx=0;
         }
         else{
             this.#ctx.fillText(char,this.#posx,this.#posy);
@@ -79,7 +80,7 @@ class Terminal{
         this.#buffer+=this.#tempBuffer;
         this.#tempBuffer="";
         this.#buffer+=str;
-        
+
         for(let i=0;i<str.length;i++){
             this.#drawChar(str[i]);
         }
@@ -100,10 +101,12 @@ class Terminal{
         }
 
     }
+
     #drawCursor(color){
         this.#ctx.fillStyle =color;
         this.#ctx.fillRect(this.#posx, this.#posy,10, this.#fontsize);
     }
+
     #handleCursor(){
         if(this.#cursor){
             this.#drawCursor('white');
@@ -126,7 +129,10 @@ class Terminal{
     nextLine(){
         this.#drawCursor('black');
         this.#posy+=this.#fontsize+this.#pady;
-        this.#posx=0; 
+        this.#posx=0;
+        this.#buffer+=this.#tempBuffer;
+        this.#tempBuffer="";
+        this.#buffer+='\n';
     }
 
 }
